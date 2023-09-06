@@ -20,6 +20,7 @@ import {
 } from "@expo/vector-icons";
 import axios from "axios";
 import Modal from "react-native-modal";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = () => {
   const [images, setImages] = useState([]);
@@ -28,21 +29,58 @@ const HomeScreen = () => {
   const [like, setLike] = useState(false);
   const [viewImage, setViewImage] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
-
+  
   const fetchData = async () => {
-    const ImageData = await axios.get(
-      "https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&per_page=20&page=1&api_key=6f102c62f41998d151e5a1b48713cf13&format=json&nojsoncallback=1&extras=url_s"
-    );
-    setImages(ImageData.data.photos.photo);
+    try {
+        const imageData = [];
+    //     imageData = await axios.get(
+    //       "https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&per_page=20&page=1&api_key=6f102c62f41998d151e5a1b48713cf13&format=json&nojsoncallback=1&extras=url_s"
+    //     );
+        
+        if(imageData?.data?.photos?.photo){
+            setImages(imageData.data.photos.photo);
+        }
+        else{
+            let keys =await AsyncStorage.getAllKeys();
+            console.log(keys)
+            keys.map(async(key)=>{
+              let data = await AsyncStorage.getItem(`${key}`);
+              let parseData = JSON.parse(data);
+              await imageData.push(parseData);
+            });
+             setImages(imageData);  
+            };
+            // console.log(imageData)
+    } catch (error) {
+        console.log(error)
+    }
+  };
+ console.log(images)
+  const storeData = async (images)=>{
+      try {
+        await AsyncStorage.clear()
+         images.map(async(item)=>{
+            let stringifyData = JSON.stringify(item);
+           await AsyncStorage.setItem(`${item.id}`, stringifyData )
+         });
+      } catch (error) {
+          console.log(error)
+      }
   };
 
   useEffect(() => {
     fetchData();
   }, []);
 
+  useCallback(()=>{
+     if(images.length !== 0){
+         storeData(images)
+     }
+  },[images]);
+ 
   return (
     <SafeAreaView style={styles.container}>
-      <Modal isVisible={isModalVisible}>
+      <Modal isVisible={isModalVisible} >
         <View style={styles.viewImageContainer}>
           <TouchableOpacity onPress={() => setIsModalVisible(false)}>
             <Feather name="x-circle" size={46} color="#fff" />
@@ -51,7 +89,7 @@ const HomeScreen = () => {
             source={{ uri: `${viewImage.url_s}` }}
             style={styles.viewImageStyle}
           />
-          <Text style={styles.viewImageText}>{viewImage.title}</Text>
+          <Text style={styles.viewImageText}>{viewImage?.title}</Text>
         </View>
       </Modal>
       <View style={styles.headerContainer}>
@@ -78,7 +116,7 @@ const HomeScreen = () => {
         style={{ flex: 1, width: "100%", paddingTop: 10, marginTop: 10 }}
       >
         <View>
-          {images
+          {images.length > 0 && images
             .filter((i) =>
               i.title.toLowerCase().includes(searchText.toLowerCase())
             )
@@ -104,7 +142,7 @@ const HomeScreen = () => {
                   </TouchableOpacity>
                   <View style={styles.imageDescriptionContainer}>
                     <Text style={styles.imageDescriptionText}>
-                      {item.title}
+                      {item?.title}
                     </Text>
                   </View>
                   <View style={styles.imageBottomContainer}>
