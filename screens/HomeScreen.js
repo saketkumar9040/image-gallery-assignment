@@ -5,16 +5,27 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Feather, Ionicons, EvilIcons, Octicons,FontAwesome5,AntDesign ,Entypo } from "@expo/vector-icons";
+import {
+  Feather,
+  Ionicons,
+  EvilIcons,
+  Octicons,
+  FontAwesome5,
+  AntDesign,
+  Entypo,
+} from "@expo/vector-icons";
 import axios from "axios";
 
 const HomeScreen = () => {
   const [images, setImages] = useState([]);
   const [searchText, setSearchText] = useState("");
-  // console.log(images)
+  const [bookmark, setBookmark] = useState(false);
+  const [like, setLike] = useState(false);
+  const [viewImage, setViewImage] = useState("");
 
   const fetchData = async () => {
     const ImageData = await axios.get(
@@ -29,59 +40,86 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Ionicons name="image-outline" size={34} color="black" />
-        <Text style={styles.headerText}>INSTA-GALLERY</Text>
-        <Octicons name="diff-added" size={24} color="black" />
-        <FontAwesome5 name="heart" size={24} color="black" />
-        <AntDesign name="message1" size={24} color="black" />
-      </View>
-      <View style={styles.searchContainer}>
-        <View style={styles.searchContainerLeft}>
-          <Feather name="search" size={24} color="black" />
-          <TextInput
-            style={styles.textInput}
-            placeholder="search your favourite images"
-            autoCapitalize="none"
-            value={searchText}
-            onChangeText={(e) => setSearchText(e)}
-          />
+      {viewImage ? (
+        <View style={styles.viewImageContainer}>
+            <TouchableOpacity onPress={()=>setViewImage("")} >
+            <Feather name="x-circle" size={46} color="black" />
+            </TouchableOpacity>
+          <Image source={{ uri: `${viewImage.url_s}` }} style={styles.viewImageStyle} />   
+            <Text style={styles.viewImageText}>{viewImage.title}</Text>
         </View>
-        <Ionicons name="send-outline" size={24} color="black" />
-      </View>
-      <ScrollView style={{ flex: 1, width: "100%", paddingTop: 10,marginTop:10, }}>
-        <View>
-          {images
-            .filter((i) =>
-              i.title.toLowerCase().includes(searchText.toLowerCase())
-            )
-            .map((item, index) => {
-              return (
-                <View style={styles.imageContainer} key={index}>
-                  <View style={styles.imageHeaderContainer}>
-                    <EvilIcons name="user" size={55} color="black" />
-                    <Text style={styles.imageName}>{item.owner}</Text>
-                    <Entypo name="dots-three-horizontal" size={24} color="black" />
-                  </View>
-                  <Image style={styles.image} source={{ uri: item.url_s }} />
-                  <View style={styles.imageDescriptionContainer}>
-                     <Text style={styles.imageDescriptionText}>
-                        {item.title}
-                     </Text>
-                  </View>
-                  <View style={styles.imageBottomContainer}>
-                    <View style={styles.imageBottomContainerLeft}>
-                  <FontAwesome5 name="heart" size={24} color="black" />
-                  <Feather name="message-circle" size={24} color="black" />
-                  <Feather name="send" size={24} color="black" />
+      ) : (
+        <>
+          <View style={styles.headerContainer}>
+            <Ionicons name="image-outline" size={34} color="black" />
+            <Text style={styles.headerText}>INSTA-GALLERY</Text>
+            <Octicons name="diff-added" size={24} color="black" />
+            <FontAwesome5 name="heart" size={24} color="black" />
+            <AntDesign name="message1" size={24} color="black" />
+          </View>
+          <View style={styles.searchContainer}>
+            <View style={styles.searchContainerLeft}>
+              <Feather name="search" size={24} color="black" />
+              <TextInput
+                style={styles.textInput}
+                placeholder="search your favourite images"
+                autoCapitalize="none"
+                value={searchText}
+                onChangeText={(e) => setSearchText(e)}
+              />
+            </View>
+            <Ionicons name="send-outline" size={24} color="black" />
+          </View>
+          <ScrollView
+            style={{ flex: 1, width: "100%", paddingTop: 10, marginTop: 10 }}
+          >
+            <View>
+              {images
+                .filter((i) =>
+                  i.title.toLowerCase().includes(searchText.toLowerCase())
+                )
+                .map((item, index) => {
+                  return (
+                    <View style={styles.imageContainer} key={index}>
+                      <View style={styles.imageHeaderContainer}>
+                        <EvilIcons name="user" size={55} color="black" />
+                        <Text style={styles.imageName}>{item.owner}</Text>
+                        <Entypo
+                          name="dots-three-horizontal"
+                          size={24}
+                          color="black"
+                        />
+                      </View>
+                      <TouchableOpacity onPress={() => setViewImage(item)}>
+                        <Image
+                          style={styles.image}
+                          source={{ uri: item.url_s }}
+                        />
+                      </TouchableOpacity>
+                      <View style={styles.imageDescriptionContainer}>
+                        <Text style={styles.imageDescriptionText}>
+                          {item.title}
+                        </Text>
+                      </View>
+                      <View style={styles.imageBottomContainer}>
+                        <View style={styles.imageBottomContainerLeft}>
+                          <FontAwesome5 name="heart" size={24} color="black" />
+                          <Feather
+                            name="message-circle"
+                            size={24}
+                            color="black"
+                          />
+                          <Feather name="send" size={24} color="black" />
+                        </View>
+                        <Feather name="bookmark" size={24} color="black" />
+                      </View>
                     </View>
-                    <Feather name="bookmark" size={24} color="black" />
-                  </View>
-                </View>
-              );
-            })}
-        </View>
-      </ScrollView>
+                  );
+                })}
+            </View>
+          </ScrollView>
+        </>
+      )}
     </SafeAreaView>
   );
 };
@@ -93,6 +131,24 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 40,
     alignItems: "center",
+  },
+  viewImageContainer:{
+     flex:1,
+     alignItems:"center",
+     gap:10,
+     backgroundColor:"transparent"
+  },
+  viewImageStyle:{
+    marginTop:20,
+     width:400,
+     height:500,
+     resizeMode:"contain"
+  },
+  viewImageText:{
+     fontSize:20,
+     fontWeight:"800",
+     textAlign:"center",
+     paddingTop:20,
   },
   headerContainer: {
     flexDirection: "row",
@@ -143,34 +199,33 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     padding: 5,
-    paddingRight:20,
+    paddingRight: 20,
     alignItems: "center",
   },
   imageName: {
-    flex:1,
+    flex: 1,
     fontSize: 15,
     fontWeight: "600",
     marginLeft: 10,
   },
-  imageBottomContainer:{
+  imageBottomContainer: {
     flex: 1,
     flexDirection: "row",
     padding: 5,
-    paddingHorizontal:10,
+    paddingHorizontal: 10,
     alignItems: "center",
   },
-  imageBottomContainerLeft:{
-    flex:1,
-    flexDirection:"row",
-    padding:5,
-    gap:10,
+  imageBottomContainerLeft: {
+    flex: 1,
+    flexDirection: "row",
+    padding: 5,
+    gap: 10,
   },
-  imageDescriptionContainer:{
-     padding:10,
+  imageDescriptionContainer: {
+    padding: 10,
   },
-  imageDescriptionText:{
-    fontSize:14,
-    fontWeight:"600",
-
-  }
+  imageDescriptionText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
 });
