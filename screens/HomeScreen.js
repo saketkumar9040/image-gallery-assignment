@@ -59,11 +59,16 @@ const HomeScreen = () => {
               return (
                 <View style={styles.imageContainer} key={index}>
                   <View style={styles.imageHeaderContainer}>
-                    <EvilIcons name="user" size={44} color="black" />
+                    <EvilIcons name="user" size={55} color="black" />
                     <Text style={styles.imageName}>{item.owner}</Text>
                     <Entypo name="dots-three-horizontal" size={24} color="black" />
                   </View>
                   <Image style={styles.image} source={{ uri: item.url_s }} />
+                  <View style={styles.imageDescriptionContainer}>
+                     <Text style={styles.imageDescriptionText}>
+                        {item.title}
+                     </Text>
+                  </View>
                   <View style={styles.imageBottomContainer}>
                     <View style={styles.imageBottomContainerLeft}>
                   <FontAwesome5 name="heart" size={24} color="black" />
@@ -94,8 +99,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     gap: 10,
-    borderWidth: 0.7,
-    marginBottom: 10,
+    // borderWidth: 0.7,
+    marginBottom: 5,
   },
   headerText: {
     flex: 1,
@@ -138,6 +143,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     padding: 5,
+    paddingRight:20,
     alignItems: "center",
   },
   imageName: {
@@ -158,5 +164,13 @@ const styles = StyleSheet.create({
     flexDirection:"row",
     padding:5,
     gap:10,
+  },
+  imageDescriptionContainer:{
+     padding:10,
+  },
+  imageDescriptionText:{
+    fontSize:14,
+    fontWeight:"600",
+
   }
 });
