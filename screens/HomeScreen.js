@@ -35,8 +35,8 @@ const HomeScreen = () => {
         // const imageData = await axios.get(
         //   "https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&per_page=20&page=1&api_key=6f102c62f41998d151e5a1b48713cf13&format=json&nojsoncallback=1&extras=url_s"
         // );
-        const imageData = []
-        if(imageData?.data?.photos?.photo !== null){
+        const imageData = [];
+        if(imageData.data.photos.photo !== undefined){
             setImages(imageData.data.photos.photo);
             storeData(imageData.data.photos.photo);
         }
@@ -47,7 +47,7 @@ const HomeScreen = () => {
               let data = await AsyncStorage.getItem(`${key}`);
               let parseData = JSON.parse(data);
                newImageData.push(parseData);
-            //    console.log(imageData)
+               console.log(imageData)
             });
             setImages(newImageData);  
         };
@@ -59,6 +59,7 @@ const HomeScreen = () => {
 
   const storeData = async (images)=>{
       try {
+        await AsyncStorage.clear()
          images.map(async(item)=>{
             let stringifyData = JSON.stringify(item);
            await AsyncStorage.setItem(`${item.id}`, stringifyData )
