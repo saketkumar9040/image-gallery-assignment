@@ -32,33 +32,33 @@ const HomeScreen = () => {
   
   const fetchData = async () => {
     try {
-        const imageData = [];
-    //     imageData = await axios.get(
-    //       "https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&per_page=20&page=1&api_key=6f102c62f41998d151e5a1b48713cf13&format=json&nojsoncallback=1&extras=url_s"
-    //     );
-        
-        if(imageData?.data?.photos?.photo){
+        // const imageData = await axios.get(
+        //   "https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&per_page=20&page=1&api_key=6f102c62f41998d151e5a1b48713cf13&format=json&nojsoncallback=1&extras=url_s"
+        // );
+        const imageData = []
+        if(imageData?.data?.photos?.photo !== null){
             setImages(imageData.data.photos.photo);
+            storeData(imageData.data.photos.photo);
         }
         else{
             let keys =await AsyncStorage.getAllKeys();
-            console.log(keys)
+            let newImageData = []
             keys.map(async(key)=>{
               let data = await AsyncStorage.getItem(`${key}`);
               let parseData = JSON.parse(data);
-              await imageData.push(parseData);
+               newImageData.push(parseData);
+            //    console.log(imageData)
             });
-             setImages(imageData);  
-            };
-            // console.log(imageData)
+            setImages(newImageData);  
+        };
     } catch (error) {
         console.log(error)
     }
   };
- console.log(images)
+ console.log(images);
+
   const storeData = async (images)=>{
       try {
-        await AsyncStorage.clear()
          images.map(async(item)=>{
             let stringifyData = JSON.stringify(item);
            await AsyncStorage.setItem(`${item.id}`, stringifyData )
@@ -72,11 +72,6 @@ const HomeScreen = () => {
     fetchData();
   }, []);
 
-  useCallback(()=>{
-     if(images.length !== 0){
-         storeData(images)
-     }
-  },[images]);
  
   return (
     <SafeAreaView style={styles.container}>
