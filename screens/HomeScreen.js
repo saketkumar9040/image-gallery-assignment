@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Feather,
   Ionicons,
@@ -34,6 +34,10 @@ const HomeScreen = () => {
     setImages(ImageData.data.photos.photo);
   };
 
+  const viewImageHandler = useCallback(()=>{
+         setViewImage("")
+  },[viewImage]);
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -42,7 +46,7 @@ const HomeScreen = () => {
     <SafeAreaView style={styles.container}>
       {viewImage ? (
         <View style={styles.viewImageContainer}>
-            <TouchableOpacity onPress={()=>setViewImage("")} >
+            <TouchableOpacity onPress={()=>viewImageHandler()} >
             <Feather name="x-circle" size={46} color="black" />
             </TouchableOpacity>
           <Image source={{ uri: `${viewImage.url_s}` }} style={styles.viewImageStyle} />   
