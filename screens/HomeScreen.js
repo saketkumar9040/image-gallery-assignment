@@ -47,7 +47,7 @@ const HomeScreen = () => {
               let data = await AsyncStorage.getItem(`${key}`);
               let parseData = JSON.parse(data);
                newImageData.push(parseData);
-               console.log(imageData)
+              //  console.log(imageData)
             });
             setImages(newImageData);  
         };
@@ -55,7 +55,6 @@ const HomeScreen = () => {
         console.log(error)
     }
   };
- console.log(images);
 
   const storeData = async (images)=>{
       try {
