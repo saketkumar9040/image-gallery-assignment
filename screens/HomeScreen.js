@@ -1,5 +1,6 @@
 import {
   Image,
+  RefreshControl,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -29,6 +30,7 @@ const HomeScreen = () => {
   const [like, setLike] = useState(false);
   const [viewImage, setViewImage] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [refreshed,setRefreshed]=useState(false);
   
   const fetchData = async () => {
     try {
@@ -70,7 +72,8 @@ const HomeScreen = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+    setRefreshed(false);
+  }, [refreshed]);
 
  
   return (
@@ -109,6 +112,7 @@ const HomeScreen = () => {
       </View>
       <ScrollView
         style={{ flex: 1, width: "100%", paddingTop: 10, marginTop: 10 }}
+        refreshControl={<RefreshControl refreshing={refreshed} onRefresh={()=>setRefreshed(true)}/>}
       >
         <View>
           {images.length > 0 && images
